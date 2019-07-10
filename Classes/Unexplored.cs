@@ -1,10 +1,11 @@
 namespace SwarmSim.Classes.Entities
 {
-    public class Wall : Space
+    public class Unexplored : Space
     {
+        public bool IsSolid = false;
         public override string ToString()
         {
-        return "W";
+        return "U";
         }
     }
 }

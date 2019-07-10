@@ -5,17 +5,26 @@ namespace SwarmSim
 {
     public class Frame
     {
-        Space[,] map;
-
-        public Frame()
+        Space[,] _map;
+        Random _rng;
+        public Frame(int xSize = 10, int ySize = 10)
         {
-            var rng = new Random();
-            map = new Space[10,10];
+            _rng = new Random();
+            _map = new Space[xSize,ySize];
+
+            _map = CreateMaze(_map);
+
+            _map = AddDrones(_map);
+        }
+
+
+        private Space[,] CreateMaze(Space[,] map)
+        {
             for (int x = 0; x < map.GetLength(0); x += 1) 
             {
                 for (int y = 0; y < map.GetLength(1); y += 1) 
                 {
-                    var rand = rng.NextDouble();
+                    var rand = _rng.NextDouble();
                     if (rand < 0.1)
                     {
                         map[x, y] = new Wall();
@@ -25,16 +34,34 @@ namespace SwarmSim
                     }
                 }
             }
+
+            return map;
+        }
+
+        private Space[,] AddDrones(Space[,] map)
+        {
+            var exampleUnexplored = new Unexplored();
+            int xCoord;
+            int yCoord;
+            do
+            {
+            xCoord = _rng.Next(0,map.GetLength(0));
+            yCoord = _rng.Next(0,map.GetLength(1));
+            } while (map[xCoord,yCoord].IsSolid == true);
+
+            map[xCoord,yCoord] = new Drone();
+
+            return map;
         }
 
         public override string ToString()
         {
             string printedMap = "";
-            for (int x = 0; x < map.GetLength(0); x += 1) 
+            for (int x = 0; x < _map.GetLength(0); x += 1) 
             {
-                for (int y = 0; y < map.GetLength(1); y += 1) 
+                for (int y = 0; y < _map.GetLength(1); y += 1) 
                 {
-                    printedMap = printedMap+map[x, y].ToString();
+                    printedMap = printedMap+_map[x, y].ToString();
                 }   
                 printedMap = printedMap+System.Environment.NewLine;
             }
