@@ -1,8 +1,6 @@
-using SwarmSim.Interfaces;
-
-namespace SwarmSim
+namespace SwarmSim.Classes.Entities
 {
-    public abstract class Space : ISpace
+    public abstract class Space
     {
         int xPos;
         int yPos;        

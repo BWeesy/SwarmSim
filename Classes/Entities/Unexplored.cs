@@ -1,4 +1,4 @@
-namespace SwarmSim
+namespace SwarmSim.Classes.Entities
 {
     public class Unexplored : Space
     {

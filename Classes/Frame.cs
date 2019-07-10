@@ -1,4 +1,5 @@
 using System;
+using SwarmSim.Classes.Entities;
 
 namespace SwarmSim
 {
