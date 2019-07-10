@@ -6,11 +6,12 @@ namespace SwarmSim.Classes.Entities
     {
         DroneGroupState GroupState = DroneGroupState.Ungrouped;
         DroneActionState ActionState = DroneActionState.Exploring;
+
         public bool IsSolid = true;    
 
         public override string ToString()
         {
-            return "D";
+            return "X";
         }
     }
 }

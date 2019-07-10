@@ -5,7 +5,7 @@ namespace SwarmSim.Classes.Entities
         public bool IsSolid = true;
         public override string ToString()
         {
-        return "W";
+        return "█";
         }
     }
 }
