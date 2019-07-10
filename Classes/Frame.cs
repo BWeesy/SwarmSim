@@ -7,14 +7,14 @@ namespace SwarmSim
     {
         Space[,] _map;
         Random _rng;
-        public Frame(int xSize = 10, int ySize = 10)
+        public Frame(int xSize = 10, int ySize = 10, int drones = 3)
         {
             _rng = new Random();
             _map = new Space[xSize,ySize];
 
             _map = CreateMaze(_map);
 
-            _map = AddDrones(_map);
+            _map = AddDrones(_map, drones);
         }
 
 
@@ -38,18 +38,21 @@ namespace SwarmSim
             return map;
         }
 
-        private Space[,] AddDrones(Space[,] map)
+        private Space[,] AddDrones(Space[,] map, int drones)
         {
-            var exampleUnexplored = new Unexplored();
             int xCoord;
             int yCoord;
-            do
-            {
-            xCoord = _rng.Next(0,map.GetLength(0));
-            yCoord = _rng.Next(0,map.GetLength(1));
-            } while (map[xCoord,yCoord].IsSolid == true);
 
-            map[xCoord,yCoord] = new Drone();
+            for (int i = 0; i < drones; i++)
+            {
+                do
+                {
+                    xCoord = _rng.Next(0,map.GetLength(0));
+                    yCoord = _rng.Next(0,map.GetLength(1));
+                } while (map[xCoord,yCoord].IsSolid == true);
+
+                map[xCoord,yCoord] = new Drone();
+            }
 
             return map;
         }
