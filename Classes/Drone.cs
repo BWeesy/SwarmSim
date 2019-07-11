@@ -4,14 +4,23 @@ namespace SwarmSim.Classes.Entities
 {
     public class Drone : Space
     {
-        DroneGroupState GroupState = DroneGroupState.Ungrouped;
-        DroneActionState ActionState = DroneActionState.Exploring;
+        public EntityType State = EntityType.UngroupedDrone;
 
-        public bool IsSolid = true;    
+        public override bool IsSolid() => true;
 
         public override string ToString()
         {
-            return "X";
+            switch (State)
+            {
+                case EntityType.UngroupedDrone:
+                    return "X";
+                case EntityType.LeaderDrone:
+                    return "0";
+                case EntityType.SubordinateDrone:
+                    return "O";
+                default:
+                    return "?";
+            }
         }
     }
 }

@@ -1,7 +1,12 @@
+using SwarmSim.Interfaces;
+using SwarmSim.Enums;
+using Newtonsoft.Json;
+
 namespace SwarmSim.Classes.Entities
 {
-    public abstract class Space
+    public abstract class Space : ISpace
     {
-        public bool IsSolid;
+        public override abstract string ToString();
+        public abstract bool IsSolid();
     }
 }

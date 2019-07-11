@@ -1,16 +1,18 @@
 using System;
 using SwarmSim.Classes.Entities;
+using SwarmSim.Interfaces;
 
 namespace SwarmSim
 {
     public class Frame
     {
-        Space[,] _map;
-        Random _rng;
+        ISpace[,] _map;
+        public ISpace[,] map => _map;
+        public Random _rng;
         public Frame(int xSize = 10, int ySize = 10, int drones = 3)
         {
             _rng = new Random();
-            _map = new Space[xSize,ySize];
+            _map = new ISpace[xSize,ySize];
 
             _map = CreateMaze(_map);
 
@@ -18,7 +20,7 @@ namespace SwarmSim
         }
 
 
-        private Space[,] CreateMaze(Space[,] map)
+        private ISpace[,] CreateMaze(ISpace[,] map)
         {
             for (int x = 0; x < map.GetLength(0); x += 1) 
             {
@@ -38,7 +40,7 @@ namespace SwarmSim
             return map;
         }
 
-        private Space[,] AddDrones(Space[,] map, int drones)
+        private ISpace[,] AddDrones(ISpace[,] map, int drones)
         {
             int xCoord;
             int yCoord;
@@ -49,7 +51,7 @@ namespace SwarmSim
                 {
                     xCoord = _rng.Next(0,map.GetLength(0));
                     yCoord = _rng.Next(0,map.GetLength(1));
-                } while (map[xCoord,yCoord].IsSolid == true);
+                } while (map[xCoord,yCoord].IsSolid());
 
                 map[xCoord,yCoord] = new Drone();
             }
