@@ -6,9 +6,9 @@ namespace SwarmSim.Classes.Entities
     {
         DroneGroupState GroupState = DroneGroupState.Ungrouped;
         DroneActionState ActionState = DroneActionState.Exploring;
-        public EntityType Type = EntityType.Drone;
 
-        public bool IsSolid = true;
+        public override bool IsSolid() => true;
+        public override EntityType Type() => EntityType.Drone;
 
         public override string ToString()
         {

@@ -1,8 +1,15 @@
+using SwarmSim.Interfaces;
+using SwarmSim.Enums;
+using Newtonsoft.Json;
+using SwarmSim.Utilities;
+
 namespace SwarmSim.Classes.Entities
 {
-    public abstract class Space
+    [JsonConverter(typeof(EntityJSONConverter))]
+    public abstract class Space : ISpace
     {
-        public bool IsSolid;
-        public string Type;
+        public override abstract string ToString();
+        public abstract bool IsSolid();
+        public abstract EntityType Type();
     }
 }
