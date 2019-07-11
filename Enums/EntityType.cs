@@ -4,6 +4,8 @@ namespace SwarmSim.Enums
     {
         Wall,
         Unexplored,
-        Drone
+        UngroupedDrone,
+        LeaderDrone,
+        SubordinateDrone
     }
 }
