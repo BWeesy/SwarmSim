@@ -1,4 +1,7 @@
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +16,18 @@ namespace SwarmSim
     public static class InitFrame
     {
         [FunctionName("InitFrame")]
-        public static async Task<IActionResult> Run(
+        public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             Frame frame = new Frame();
             log.LogInformation("Creating new Frame");
 
-            return (ActionResult)new OkObjectResult($"{frame.ToString()}");
+            var responseJson = JsonConvert.SerializeObject(frame.map);
+
+            return new HttpResponseMessage(HttpStatusCode.OK) {
+                Content = new StringContent(responseJson, Encoding.UTF8, "application/json")
+            };
         }
     }
 }

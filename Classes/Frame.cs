@@ -6,7 +6,8 @@ namespace SwarmSim
     public class Frame
     {
         Space[,] _map;
-        Random _rng;
+        public Space[,] map => _map;
+        public Random _rng;
         public Frame(int xSize = 10, int ySize = 10, int drones = 3)
         {
             _rng = new Random();
