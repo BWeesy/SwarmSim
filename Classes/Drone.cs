@@ -4,14 +4,13 @@ namespace SwarmSim.Classes.Entities
 {
     public class Drone : Space
     {
-        EntityType _state = EntityType.UngroupedDrone;
+        public EntityType State = EntityType.UngroupedDrone;
 
         public override bool IsSolid() => true;
-        public override EntityType Type() => _state;
 
         public override string ToString()
         {
-            switch (_state)
+            switch (State)
             {
                 case EntityType.UngroupedDrone:
                     return "X";
