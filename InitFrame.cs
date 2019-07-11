@@ -21,6 +21,7 @@ namespace SwarmSim
             ILogger log)
         {
             Frame frame = new Frame();
+            frame.Init();
             log.LogInformation($"{frame.ToString()}");
 
             var responseJson = JsonConvert.SerializeObject(frame.map);

@@ -13,7 +13,9 @@ namespace SwarmSim
         {
             _rng = new Random();
             _map = new ISpace[xSize,ySize];
-
+        }
+        public void Init()
+        {
             _map = CreateMaze(_map);
 
             _map = AddDrones(_map, drones);
