@@ -44,6 +44,14 @@ namespace SwarmSim.Classes.Entities
                             return new Unexplored();
                         case EntityType.UngroupedDrone:
                             return new Drone();
+                        case EntityType.LeaderDrone:
+                            return new Drone(){
+                                State = EntityType.LeaderDrone
+                            };
+                        case EntityType.SubordinateDrone:
+                            return new Drone(){
+                                State = EntityType.SubordinateDrone
+                            };
                         default:
                         throw new NotImplementedException("Not implemented yet");
                     }
