@@ -10,15 +10,16 @@ namespace SwarmSim
         ISpace[,] _map;
         public ISpace[,] map => _map;
         public Random _rng;
-        public Frame(int xSize = 25, int ySize = 25, int drones = 3)
+        public Frame(int xSize = 25, int ySize = 25)
         {
             _rng = new Random();
             _map = new ISpace[xSize,ySize];
         }
-        public void Init()
+
+        public void Init(int drones = 3)
         {
             _map = InitialiseMapToWalls(_map);
-            _map = MapGenStep(_map, _rng.Next(xSize), _rng.Next(ySize));
+            _map = MapGenStep(_map, _rng.Next(map.GetLength(0)), _rng.Next(map.GetLength(1)));
             //TODO Validate generated map
             _map = AddDrones(_map, drones);
         }
@@ -113,6 +114,26 @@ namespace SwarmSim
                 printedMap = printedMap+System.Environment.NewLine;
             }
             return printedMap;
+        }
+
+        public static bool IsValidMap(ISpace[,] map)
+        {
+            //Check map has length in both dimensions
+            if (map.GetLength(0) == 0) return false;
+            if (map.GetLength(1) == 0) return false;
+
+            //null check each space
+            foreach(var space in map)
+            {
+                if(space == null) return false;
+            }
+
+            return true;
+        }
+
+        public static ISpace[,] NextStep(ISpace[,] map)
+        {
+            
         }
     }
 }
