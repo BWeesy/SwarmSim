@@ -47,22 +47,22 @@ namespace SwarmSim
             //Edge checking
 
             //x+ve
-            if(x < map.GetLength(0)-2 && map[x+1,y] is Wall && map[x+2,y] is Wall)
+            if(x < map.GetLength(0)-3 && map[x+1,y] is Wall && map[x+2,y] is Wall)
             {
                 neighbours.Add((x+2,y,x+1,y));
             }
             //x-ve
-            if(x>1 && map[x-1,y] is Wall && map[x-2,y] is Wall)
+            if(x>2 && map[x-1,y] is Wall && map[x-2,y] is Wall)
             {
                 neighbours.Add((x-2,y,x-1,y));
             }
             //y+ve
-            if(y < map.GetLength(1)-2 && map[x,y+1] is Wall && map[x,y+2] is Wall)
+            if(y < map.GetLength(1)-3 && map[x,y+1] is Wall && map[x,y+2] is Wall)
             {
                 neighbours.Add((x,y+2,x,y+1));
             }
             //y-ve
-            if(y>1 && map[x,y-1] is Wall && map[x,y-2] is Wall)
+            if(y>2 && map[x,y-1] is Wall && map[x,y-2] is Wall)
             {
                 neighbours.Add((x,y-2,x,y-1));
             }
