@@ -18,26 +18,28 @@ namespace SwarmSim
 
         public void Init(int drones = 3)
         {
+            do
+            {
             _map = InitialiseMapToWalls(_map);
             _map = MapGenStep(_map, _rng.Next(map.GetLength(0)), _rng.Next(map.GetLength(1)));
-            //TODO Validate generated map
             _map = AddDrones(_map, drones);
+            } while (!IsValidMap(_map));
         }
 
         private ISpace[,] MapGenStep (ISpace[,] originalMap, int currentX, int currentY)
         {
             var map = originalMap;
-            var neighbours = FindCandidateNeighbours(map, currentX, currentY);
+            var validCandidates = FindCandidateNeighbours(map, currentX, currentY);
 
-            while (neighbours.Count > 0)
+            while (validCandidates.Count > 0)
             {
-                var cutTo = neighbours[_rng.Next(neighbours.Count)];
+                var cutTo = validCandidates[_rng.Next(validCandidates.Count)];
 
                 map[cutTo.targetX, cutTo.targetY] = new Unexplored();
                 map[cutTo.wallX, cutTo.wallY] = new Unexplored();
                 map = MapGenStep(map, cutTo.targetX, cutTo.targetY);
 
-                neighbours = FindCandidateNeighbours(map, currentX, currentY);
+                validCandidates = FindCandidateNeighbours(map, currentX, currentY);
             }
 
             return map;
@@ -46,28 +48,31 @@ namespace SwarmSim
         private List<(int targetX, int targetY, int wallX, int wallY)> FindCandidateNeighbours (ISpace[,] originalMap, int x, int y)
         {
             var neighbours = new List<(int targetX, int targetY, int wallX, int wallY)>();
-            //Edge checking
 
-            //x+ve
+            //x+ve direction
             if(x < map.GetLength(0)-3 && map[x+1,y] is Wall && map[x+2,y] is Wall)
             {
                 neighbours.Add((x+2,y,x+1,y));
             }
-            //x-ve
+
+            //x-ve direction
             if(x>2 && map[x-1,y] is Wall && map[x-2,y] is Wall)
             {
                 neighbours.Add((x-2,y,x-1,y));
             }
-            //y+ve
+
+            //y+ve direction
             if(y < map.GetLength(1)-3 && map[x,y+1] is Wall && map[x,y+2] is Wall)
             {
                 neighbours.Add((x,y+2,x,y+1));
             }
-            //y-ve
+
+            //y-ve direction
             if(y>2 && map[x,y-1] is Wall && map[x,y-2] is Wall)
             {
                 neighbours.Add((x,y-2,x,y-1));
             }
+
             return neighbours;
         }
 
@@ -131,9 +136,11 @@ namespace SwarmSim
             return true;
         }
 
-        public static ISpace[,] NextStep(ISpace[,] map)
+        public static ISpace[,] NextStep(ISpace[,] previousMap)
         {
-            
+            //TODO Find drones
+            //TODO Apply their logic
+            return previousMap;
         }
     }
 }
