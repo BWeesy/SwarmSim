@@ -1,6 +1,7 @@
 using System;
 using SwarmSim.Classes.Entities;
 using SwarmSim.Interfaces;
+using System.Collections.Generic;
 
 namespace SwarmSim
 {
@@ -14,30 +15,57 @@ namespace SwarmSim
             _rng = new Random();
             _map = new ISpace[xSize,ySize];
 
-            _map = CreateMaze(_map);
+            _map = MapGenStep(_map, _rng.Next(xSize), _rng.Next(ySize));
+
+            //Validate generated map
 
             _map = AddDrones(_map, drones);
         }
 
-
-        private ISpace[,] CreateMaze(ISpace[,] map)
+        private ISpace[,] MapGenStep (ISpace[,] originalMap, int currentX, int currentY)
         {
-            for (int x = 0; x < map.GetLength(0); x += 1) 
+            var map = originalMap;
+            var neighbours = FindCandidateNeighbours(map, currentX, currentY);
+
+            while (neighbours.Count > 0)
             {
-                for (int y = 0; y < map.GetLength(1); y += 1) 
-                {
-                    var rand = _rng.NextDouble();
-                    if (rand < 0.1)
-                    {
-                        map[x, y] = new Wall();
-                    } else
-                    {
-                        map[x, y] = new Unexplored();
-                    }
-                }
+                var cutTo = neighbours[_rng.Next(neighbours.Count)];
+
+                //Make cut to neighbour, call generation step on that neightbour
+                //Set working version of the returned map
+
+                neighbours = FindCandidateNeighbours(map, currentX, currentY);
             }
 
             return map;
+        }
+
+        private List<(int x, int y)> FindCandidateNeighbours (ISpace[,] originalMap, int x, int y)
+        {
+            var neighbours = new List<(int x, int y)>();
+            //Edge checking
+
+            //x+ve
+            if(map[x+1,y] is null && map[x+2,y] is null)
+            {
+                neighbours.Add((x+2,y));
+            }
+            //x-ve
+            if(map[x-1,y] is null && map[x-2,y] is null)
+            {
+                neighbours.Add((x-2,y));
+            }
+            //y+ve
+            if(map[x,y+1] is null && map[x,y+2] is null)
+            {
+                neighbours.Add((x,y+2));
+            }
+            //y-ve
+            if(map[x,y-1] is null && map[x,y-2] is null)
+            {
+                neighbours.Add((x,y-2));
+            }
+            return neighbours;
         }
 
         private ISpace[,] AddDrones(ISpace[,] map, int drones)
