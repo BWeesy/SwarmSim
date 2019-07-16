@@ -10,11 +10,11 @@ namespace SwarmSim
         ISpace[,] _map;
         public ISpace[,] map => _map;
         public Random _rng;
-        public Frame(int xSize = 10, int ySize = 10, int drones = 3)
+        public Frame(int xSize = 100, int ySize = 100, int drones = 3)
         {
             _rng = new Random();
             _map = new ISpace[xSize,ySize];
-
+            _map = InitialiseMapToWalls(_map);
             _map = MapGenStep(_map, _rng.Next(xSize), _rng.Next(ySize));
 
             //Validate generated map
@@ -31,8 +31,9 @@ namespace SwarmSim
             {
                 var cutTo = neighbours[_rng.Next(neighbours.Count)];
 
-                //Make cut to neighbour, call generation step on that neightbour
-                //Set working version of the returned map
+                map[cutTo.targetX, cutTo.targetY] = new Unexplored();
+                map[cutTo.wallX, cutTo.wallY] = new Unexplored();
+                map = MapGenStep(map, cutTo.targetX, cutTo.targetY);
 
                 neighbours = FindCandidateNeighbours(map, currentX, currentY);
             }
@@ -40,30 +41,30 @@ namespace SwarmSim
             return map;
         }
 
-        private List<(int x, int y)> FindCandidateNeighbours (ISpace[,] originalMap, int x, int y)
+        private List<(int targetX, int targetY, int wallX, int wallY)> FindCandidateNeighbours (ISpace[,] originalMap, int x, int y)
         {
-            var neighbours = new List<(int x, int y)>();
+            var neighbours = new List<(int targetX, int targetY, int wallX, int wallY)>();
             //Edge checking
 
             //x+ve
-            if(map[x+1,y] is null && map[x+2,y] is null)
+            if(x < map.GetLength(0)-2 && map[x+1,y] is Wall && map[x+2,y] is Wall)
             {
-                neighbours.Add((x+2,y));
+                neighbours.Add((x+2,y,x+1,y));
             }
             //x-ve
-            if(map[x-1,y] is null && map[x-2,y] is null)
+            if(x>1 && map[x-1,y] is Wall && map[x-2,y] is Wall)
             {
-                neighbours.Add((x-2,y));
+                neighbours.Add((x-2,y,x-1,y));
             }
             //y+ve
-            if(map[x,y+1] is null && map[x,y+2] is null)
+            if(y < map.GetLength(1)-2 && map[x,y+1] is Wall && map[x,y+2] is Wall)
             {
-                neighbours.Add((x,y+2));
+                neighbours.Add((x,y+2,x,y+1));
             }
             //y-ve
-            if(map[x,y-1] is null && map[x,y-2] is null)
+            if(y>1 && map[x,y-1] is Wall && map[x,y-2] is Wall)
             {
-                neighbours.Add((x,y-2));
+                neighbours.Add((x,y-2,x,y-1));
             }
             return neighbours;
         }
@@ -84,6 +85,18 @@ namespace SwarmSim
                 map[xCoord,yCoord] = new Drone();
             }
 
+            return map;
+        }
+
+        private ISpace[,] InitialiseMapToWalls (ISpace[,] map)
+        {
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(0); j++)
+                {
+                    map[i,j] = new Wall();
+                }
+            }
             return map;
         }
 
