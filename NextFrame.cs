@@ -25,13 +25,17 @@ namespace SwarmSim
             //Read request body
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject<Space[,]>(requestBody);
-
             //Validate map
             if(!Frame.IsValidMap(data)) throw new InvalidDataException ("Invalid data");
 
+            var incomingFrame = new Frame(0, 0, data);
+            log.LogInformation($"{incomingFrame.ToString()}");
+
             //Create next map from incoming map
             var returnData = Frame.NextStep(data);
-            
+            var outgoingFrame = new Frame(0, 0, returnData);
+            log.LogInformation($"{outgoingFrame.ToString()}");
+
             //Return created map
             var responseJson = JsonConvert.SerializeObject(returnData);
             return new HttpResponseMessage(HttpStatusCode.OK) {

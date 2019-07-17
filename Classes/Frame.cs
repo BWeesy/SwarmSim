@@ -11,10 +11,16 @@ namespace SwarmSim
         ISpace[,] _map;
         public ISpace[,] map => _map;
         public Random _rng;
-        public Frame(int xSize = 25, int ySize = 25)
+        public Frame(int xSize = 25, int ySize = 25, ISpace[,] map = null)
         {
             _rng = new Random();
-            _map = new ISpace[xSize,ySize];
+            if (map == null)
+            {
+                _map = new ISpace[xSize,ySize];
+            } else
+            {
+                _map = map;
+            }
         }
 
         public void Init(int drones = 3)
