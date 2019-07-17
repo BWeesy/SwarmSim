@@ -24,10 +24,40 @@ namespace SwarmSim.Classes.Entities
             }
         }
 
-        public static ISpace[,] Explore(int x, int y, Drone drone, ISpace[,] previousMap)
+        public static ISpace[,] UngroupedDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
             return map;
         }
+
+        public static ISpace[,] LeaderDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
+        {
+            var map = previousMap;
+            return map;
+        }
+
+        public static ISpace[,] SubordinateDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
+        {
+            var map = previousMap;
+            return map;
+        }
+
+        private static ISpace[,] MoveDrone(int currentX, int currentY, int targetX, int targetY, ISpace[,] map)
+        {
+            //Validate currentCoords are actually a drone
+
+            //Validate target is not solid
+
+            //Move drone into the target space
+
+            //Change old space to an Explored space
+
+        }
+        //TODO Move Drone Method
+        //TODO Patchfinding method
+        //TODO Explore method
+            //Look for closest unexplored
+            //Pathfind to the closest unexplored
+            //Make first move along that path
     }
 }

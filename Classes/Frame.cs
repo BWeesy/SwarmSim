@@ -175,7 +175,13 @@ namespace SwarmSim
                 switch (drone.drone.State)
                 {
                     case EntityType.UngroupedDrone:
-                        map = Drone.Explore(drone.x, drone.y, drone.drone, map);
+                        map = Drone.UngroupedDroneMove(drone.x, drone.y, drone.drone, map);
+                        break;
+                    case EntityType.LeaderDrone:
+                        map = Drone.LeaderDroneMove(drone.x, drone.y, drone.drone, map);
+                        break;
+                    case EntityType.SubordinateDrone:
+                        map = Drone.SubordinateDroneMove(drone.x, drone.y, drone.drone, map);
                         break;
                     default:
                         break;
