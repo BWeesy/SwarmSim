@@ -42,6 +42,8 @@ namespace SwarmSim.Classes.Entities
                             return new Wall();
                         case EntityType.Unexplored:
                             return new Unexplored();
+                        case EntityType.Explored:
+                            return new Explored();
                         case EntityType.UngroupedDrone:
                             return new Drone();
                         case EntityType.LeaderDrone:

@@ -10,7 +10,7 @@ namespace SwarmSim.Classes.Entities
 
         public override string ToString()
         {
-        return "╳";
+        return "X";
         }
     }
 }
