@@ -1,4 +1,5 @@
 using SwarmSim.Enums;
+using SwarmSim.Interfaces;
 
 namespace SwarmSim.Classes.Entities
 {
@@ -21,6 +22,12 @@ namespace SwarmSim.Classes.Entities
                 default:
                     return "?";
             }
+        }
+
+        public static ISpace[,] Explore(int x, int y, Drone drone, ISpace[,] previousMap)
+        {
+            var map = previousMap;
+            return map;
         }
     }
 }

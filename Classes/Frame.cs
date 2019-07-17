@@ -1,7 +1,8 @@
 using System;
+using System.Collections.Generic;
 using SwarmSim.Classes.Entities;
 using SwarmSim.Interfaces;
-using System.Collections.Generic;
+using SwarmSim.Enums;
 
 namespace SwarmSim
 {
@@ -156,10 +157,32 @@ namespace SwarmSim
 
         public static ISpace[,] NextStep(ISpace[,] previousMap)
         {
-            //TODO Find drones
-            var drones = FindDrones(previousMap);
-            //TODO Apply their logic
-            return previousMap;
+            //Initialise working map
+            var map = previousMap;
+
+            //Find drones
+            var drones = FindDrones(map);
+
+            //TODO Sort the order that drones take their turn
+                //Ungrouped
+                //Leaders                
+                //Subordinates
+
+            //Apply the movement of each drone in turn
+            foreach (var drone in drones)
+            {
+                //Update map with new position
+                switch (drone.drone.State)
+                {
+                    case EntityType.UngroupedDrone:
+                        map = Drone.Explore(drone.x, drone.y, drone.drone, map);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return map;
         }
+
     }
 }
