@@ -26,7 +26,7 @@ namespace SwarmSim
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject<Space[,]>(requestBody);
 
-            //Validate is a valid map
+            //Validate map
             if(!Frame.IsValidMap(data)) throw new InvalidDataException ("Invalid data");
 
             //Create next map from incoming map

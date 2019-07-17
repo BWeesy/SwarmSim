@@ -95,6 +95,24 @@ namespace SwarmSim
             return map;
         }
 
+        private static List<(int x, int y, Drone drone)> FindDrones(ISpace[,] map)
+        {
+            // IndexOf and FindIndex are only 1 dimensional...
+            var drones = new List<(int x, int y, Drone drone)>();
+
+            for (int i = 0; i < map.GetLength(0); i++)
+            {
+                for (int j = 0; j < map.GetLength(0); j++)
+                {
+                    if(map[i,j] is Drone)
+                    {
+                        drones.Add((i,j,(Drone) map[i,j]));
+                    }
+                }
+            }
+            return drones;
+        }
+
         private ISpace[,] InitialiseMapToWalls (ISpace[,] map)
         {
             for (int i = 0; i < map.GetLength(0); i++)
@@ -139,6 +157,7 @@ namespace SwarmSim
         public static ISpace[,] NextStep(ISpace[,] previousMap)
         {
             //TODO Find drones
+            var drones = FindDrones(previousMap);
             //TODO Apply their logic
             return previousMap;
         }
