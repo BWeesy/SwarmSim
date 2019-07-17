@@ -42,8 +42,9 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-        private static ISpace[,] MoveDrone(int currentX, int currentY, int targetX, int targetY, ISpace[,] map)
+        private static ISpace[,] MoveDrone(int currentX, int currentY, int targetX, int targetY, ISpace[,] previousMap)
         {
+            var map = previousMap;
             //Validate currentCoords are actually a drone
 
             //Validate target is not solid
@@ -51,7 +52,7 @@ namespace SwarmSim.Classes.Entities
             //Move drone into the target space
 
             //Change old space to an Explored space
-
+            return map;
         }
         //TODO Move Drone Method
         //TODO Patchfinding method
