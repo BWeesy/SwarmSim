@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SwarmSim.Classes.Entities;
 using SwarmSim.Interfaces;
 using SwarmSim.Enums;
+using System.Linq;
 
 namespace SwarmSim
 {
@@ -169,13 +170,12 @@ namespace SwarmSim
             //Find drones
             var drones = FindDrones(map);
 
-            //TODO Sort the order that drones take their turn
-                //Ungrouped
-                //Leaders                
-                //Subordinates
+            var sortedDrones = drones.Where(x => x.drone.State == EntityType.UngroupedDrone)
+            .Concat(drones.Where(x => x.drone.State == EntityType.LeaderDrone))
+            .Concat(drones.Where(x => x.drone.State == EntityType.SubordinateDrone));
 
             //Apply the movement of each drone in turn
-            foreach (var drone in drones)
+            foreach (var drone in sortedDrones)
             {
                 //Update map with new position
                 switch (drone.drone.State)
