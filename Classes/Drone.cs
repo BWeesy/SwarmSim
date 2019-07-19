@@ -9,7 +9,7 @@ namespace SwarmSim.Classes.Entities
     {
         public EntityType State = EntityType.UngroupedDrone;
 
-        public override bool IsSolid() => true;
+        public override bool IsSolid() => false;
 
         public override string ToString()
         {
@@ -73,7 +73,9 @@ namespace SwarmSim.Classes.Entities
             map[targetX, targetY] = map[currentX, currentY];
 
             //Change old space to an Explored space
-            map[currentX, currentY] = new Explored();
+            map[currentX, currentY] = map[targetX, targetY] is Drone
+            ? map[targetX, targetY]
+            : new Explored();
 
             return map;
         }
