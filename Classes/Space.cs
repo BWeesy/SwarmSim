@@ -43,7 +43,9 @@ namespace SwarmSim.Classes.Entities
                         case EntityType.Unexplored:
                             return new Unexplored();
                         case EntityType.Explored:
-                            return new Explored();
+                            return new Explored(
+                                    obj["Activity"] != null && Int32.TryParse(obj["Activity"].ToString(), out var activity) ? activity : 0
+                                );
                         case EntityType.UngroupedDrone:
                             return new Drone();
                         case EntityType.LeaderDrone:

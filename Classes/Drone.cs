@@ -69,13 +69,15 @@ namespace SwarmSim.Classes.Entities
                throw new Exception($"Failed to move drone into {map[targetX, targetY]} as that space is solid");
             }
 
-            //Move drone into the target space
-            map[targetX, targetY] = map[currentX, currentY];
-
-            //Change old space to an Explored space
-            map[currentX, currentY] = map[targetX, targetY] is Drone
-            ? map[targetX, targetY]
-            : new Explored();
+            //Move drone into the target space, swapping with a drone if moving into it's space
+            if(map[targetX, targetY] is Drone){
+                var temp = map[targetX, targetY];
+                map[currentX, currentY] = map[targetX, targetY];
+                map[targetX, targetY] = temp;
+            } else {
+                map[targetX, targetY] = map[currentX, currentY];
+                map[currentX, currentY] = new Explored(100);
+            }
 
             return map;
         }
