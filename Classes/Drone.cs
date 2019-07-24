@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SwarmSim.Enums;
 using SwarmSim.Interfaces;
+using System.Linq;
 
 namespace SwarmSim.Classes.Entities
 {
@@ -31,7 +32,7 @@ namespace SwarmSim.Classes.Entities
             var map = previousMap;
             //TODO Look for close Leaders with space in their group. If found, move towards them
             //Else, explore by moving towards closest unexplored space
-            var targetSpace = FindRandomAdjacent(x, y, map);
+            var targetSpace = PickMoveTarget(x, y, map);
 
             if (targetSpace != null)
             {
@@ -82,67 +83,71 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-        private static (int x, int y)? FindRandomAdjacent(int x, int y, ISpace[,] map)
+        private static (int x, int y)? PickMoveTarget(int x, int y, ISpace[,] map)
         {
             var unexploredNeighbours = new List<(int x, int y)>();
-            var exploredNeighbours = new List<(int x, int y)>();
+            var exploredNeighbours = new List<(int x, int y, int activity)>();
             var rng = new Random();
 
             //x+ve direction
-            if(x < map.GetLength(0) && !map[x+1,y].IsSolid())
+            if(x < map.GetLength(0) && !map[x+1, y].IsSolid())
             {
-                if (map[x+1,y] is Unexplored)
+                if (map[x+1, y] is Unexplored)
                 {
-                        unexploredNeighbours.Add((x+1,y));
+                    unexploredNeighbours.Add((x+1, y));
                 }
-                if (map[x+1,y] is Explored)
-                {                
-                        exploredNeighbours.Add((x+1,y));
+                if (map[x+1, y] is Explored)
+                {
+                    var explored = (Explored) map[x+1, y];            
+                    exploredNeighbours.Add((x+1, y, explored.Activity));
                 }                
             }
 
             //x-ve direction
-            if(x>0 && !map[x-1,y].IsSolid())
+            if(x > 0 && !map[x-1, y].IsSolid())
             {
-                if (map[x-1,y] is Unexplored)
+                if (map[x-1, y] is Unexplored)
                 {
-                        unexploredNeighbours.Add((x-1,y));
+                    unexploredNeighbours.Add((x-1, y));
                 }
-                if (map[x-1,y] is Explored)
+                if (map[x-1, y] is Explored)
                 {
-                        exploredNeighbours.Add((x-1,y));
+                    var explored = (Explored) map[x-1, y];   
+                    exploredNeighbours.Add((x-1, y, explored.Activity));
                 }   
             }
 
             //y+ve direction
-            if(y < map.GetLength(1) && !map[x,y+1].IsSolid())
+            if(y < map.GetLength(1) && !map[x, y+1].IsSolid())
             {
-                if (map[x,y+1] is Unexplored)
+                if (map[x, y+1] is Unexplored)
                 {
-                        unexploredNeighbours.Add((x,y+1));
+                    unexploredNeighbours.Add((x, y+1));
                 }
                 if (map[x,y+1] is Explored)
                 {
-                        exploredNeighbours.Add((x,y+1));
+                    var explored = (Explored) map[x, y+1]; 
+                    exploredNeighbours.Add((x, y+1, explored.Activity));
                 } 
             }
 
             //y-ve direction
-            if(y>0 && !map[x,y-1].IsSolid())
+            if(y > 0 && !map[x, y-1].IsSolid())
             {
-                if (map[x,y-1] is Unexplored)
+                if (map[x, y-1] is Unexplored)
                 {
-                        unexploredNeighbours.Add((x,y-1));
+                    unexploredNeighbours.Add((x, y-1));
                 }
-                if (map[x,y-1] is Explored)
+                if (map[x, y-1] is Explored)
                 {
-                        exploredNeighbours.Add((x,y-1));
+                    var explored = (Explored) map[x, y-1]; 
+                    exploredNeighbours.Add((x, y-1, explored.Activity));
                 } 
             }
             
             return unexploredNeighbours.Count > 0
             ? unexploredNeighbours[rng.Next(unexploredNeighbours.Count)]
-            : exploredNeighbours[rng.Next(exploredNeighbours.Count)];
+            : exploredNeighbours.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
         }
         //TODO Patchfinding method
         //TODO Explore method
