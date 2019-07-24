@@ -103,7 +103,7 @@ namespace SwarmSim
             return map;
         }
 
-        private static List<(int x, int y, Drone drone)> FindDrones(ISpace[,] map)
+        private static List<(int x, int y, Drone drone)> FindDronesAndDecrementExplored(ISpace[,] map)
         {
             // IndexOf and FindIndex are only 1 dimensional...
             var drones = new List<(int x, int y, Drone drone)>();
@@ -115,6 +115,13 @@ namespace SwarmSim
                     if(map[i,j] is Drone)
                     {
                         drones.Add((i,j,(Drone) map[i,j]));
+                    }
+                    if(map[i,j] is Explored)
+                    {
+                        var explored = (Explored) map[i,j];
+                        if(explored.Activity > 0){
+                            explored.Activity--;
+                        }
                     }
                 }
             }
@@ -162,13 +169,20 @@ namespace SwarmSim
             return true;
         }
 
+        public static ISpace[,] DecrementActivityInExplored(ISpace[,] previousMap)
+        {
+            var map = previousMap;
+
+            return map;
+        }
+
         public static ISpace[,] NextStep(ISpace[,] previousMap)
         {
             //Initialise working map
             var map = previousMap;
 
-            //Find drones
-            var drones = FindDrones(map);
+            //Find drones and decrement the activities of explored spaces
+            var drones = FindDronesAndDecrementExplored(map);
 
             var sortedDrones = drones.Where(x => x.drone.State == EntityType.UngroupedDrone)
             .Concat(drones.Where(x => x.drone.State == EntityType.LeaderDrone))
