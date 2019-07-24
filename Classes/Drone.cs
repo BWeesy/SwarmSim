@@ -90,7 +90,7 @@ namespace SwarmSim.Classes.Entities
             var rng = new Random();
 
             //x+ve direction
-            if(x < map.GetLength(0) && !map[x+1, y].IsSolid())
+            if(x < map.GetLength(0) - 1 && !map[x+1, y].IsSolid())
             {
                 if (map[x+1, y] is Unexplored)
                 {
@@ -118,7 +118,7 @@ namespace SwarmSim.Classes.Entities
             }
 
             //y+ve direction
-            if(y < map.GetLength(1) && !map[x, y+1].IsSolid())
+            if(y < map.GetLength(1) - 1 && !map[x, y+1].IsSolid())
             {
                 if (map[x, y+1] is Unexplored)
                 {
