@@ -35,27 +35,44 @@ namespace SwarmSim.Classes.Entities
             }
         }
 
-        public static ISpace[,] UngroupedDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
+        public static ISpace[,] UngroupedDroneMove(int currentX, int currentY, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
             //Explore by moving towards closest unexplored space, prefering the least recently explored space
 
-            var neighbours = GetNeighbours(x, y, map);   
+            var neighbours = GetNeighbours(currentX, currentY, map);   
 
             var targetSpace = Explore(neighbours);
 
             if (targetSpace != null)
             {
-                map = MoveDrone(x, y, targetSpace.Value.x, targetSpace.Value.y, map);
+                map = MoveDrone(currentX, currentY, targetSpace.Value.x, targetSpace.Value.y, map);
             }
 
             return map;
         }
 
-        public static ISpace[,] PredatorDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
+        public static ISpace[,] PredatorDroneMove(int currentX, int currentY, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
-            //Explore by moving towards closest unexplored space
+
+            var neighbours = GetNeighbours(currentX, currentY, map);   
+            (int x, int y)? targetSpace = null;
+
+            //targetSpace = Kill(neighbours, map);
+
+            if(targetSpace == null){
+                targetSpace = Hunt(neighbours, map);
+            }
+            if(targetSpace == null){
+                targetSpace = Explore(neighbours);
+            }
+
+            if (targetSpace != null)
+            {
+                map = MoveDrone(currentX, currentY, targetSpace.Value.x, targetSpace.Value.y, map);
+            }
+
             return map;
         }
 
@@ -81,32 +98,45 @@ namespace SwarmSim.Classes.Entities
             }
 
             //Move drone into the target space, swapping with a drone if moving into it's space
-            if(map[targetX, targetY] is Drone){
+            var targetDrone = map[targetX, targetY] as Drone;
+            var currentDrone = map[currentX, currentY] as Drone;
+            if(targetDrone != null){
                 var temp = map[targetX, targetY];
                 map[currentX, currentY] = map[targetX, targetY];
                 map[targetX, targetY] = temp;
             } else {
                 map[targetX, targetY] = map[currentX, currentY];
-                map[currentX, currentY] = new Explored(100);
+                map[currentX, currentY] = new Explored(currentDrone.State == EntityType.UngroupedDrone ? 100 : 0);
             }
 
             return map;
         }
 
-        private static (int x, int y)? Explore((List<(int x, int y)> unexploredNeighbours, List<(int x, int y, int activity)> exploredNeighbours) neighbours)
+        private static (int x, int y)? Explore(Neighbours neighbours)
         {   
-            var unexploredNeighbours = neighbours.unexploredNeighbours;
-            var exploredNeighbours = neighbours.exploredNeighbours;
+            if(neighbours.Unexplored.Count + neighbours.Explored.Count == 0){
+                return null;
+            }
 
             var rng = new Random();            
-            return unexploredNeighbours.Count > 0
-            ? unexploredNeighbours[rng.Next(unexploredNeighbours.Count)]
-            : exploredNeighbours.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
+            return neighbours.Unexplored.Count > 0
+            ? neighbours.Unexplored[rng.Next(neighbours.Unexplored.Count)]
+            : neighbours.Explored.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
+        }
+        
+        private static (int x, int y)? Hunt(Neighbours neighbours, ISpace[,] map)
+        {   
+            var rng = new Random();
+
+            var activeNeighbours = neighbours.Explored.Where(e => e.activity > 0).OrderByDescending(e => e.activity);
+            if(activeNeighbours.Count() > 0) return activeNeighbours.Select(e => (e.x, e.y)).FirstOrDefault();
+            return null;
         }
 
-        private static (List<(int x, int y)> unexploredNeighbours, List<(int x, int y, int activity)> exploredNeighbours) GetNeighbours(int x, int y, ISpace[,] map){
+        private static Neighbours GetNeighbours(int x, int y, ISpace[,] map){
             var unexploredNeighbours = new List<(int x, int y)>();
             var exploredNeighbours = new List<(int x, int y, int activity)>();
+            var droneNeighbours = new List<(int x, int y, Drone drone)>();
 
             //x+ve direction
             if(x < map.GetLength(0) - 1 && !map[x+1, y].IsSolid())
@@ -119,7 +149,12 @@ namespace SwarmSim.Classes.Entities
                 {
                     var explored = (Explored) map[x+1, y];            
                     exploredNeighbours.Add((x+1, y, explored.Activity));
-                }                
+                } 
+                if (map[x+1, y] is Drone)
+                {
+                    var drone = (Drone) map[x+1, y];            
+                    droneNeighbours.Add((x+1, y, drone));
+                }               
             }
 
             //x-ve direction
@@ -133,6 +168,11 @@ namespace SwarmSim.Classes.Entities
                 {
                     var explored = (Explored) map[x-1, y];   
                     exploredNeighbours.Add((x-1, y, explored.Activity));
+                } 
+                if (map[x-1, y] is Drone)
+                {
+                    var drone = (Drone) map[x-1, y];            
+                    droneNeighbours.Add((x-1, y, drone));
                 }   
             }
 
@@ -143,11 +183,16 @@ namespace SwarmSim.Classes.Entities
                 {
                     unexploredNeighbours.Add((x, y+1));
                 }
-                if (map[x,y+1] is Explored)
+                if (map[x, y+1] is Explored)
                 {
                     var explored = (Explored) map[x, y+1]; 
                     exploredNeighbours.Add((x, y+1, explored.Activity));
                 } 
+                if (map[x, y+1] is Drone)
+                {
+                    var drone = (Drone) map[x,y+1];            
+                    droneNeighbours.Add((x,y+1, drone));
+                }
             }
 
             //y-ve direction
@@ -162,9 +207,18 @@ namespace SwarmSim.Classes.Entities
                     var explored = (Explored) map[x, y-1]; 
                     exploredNeighbours.Add((x, y-1, explored.Activity));
                 } 
+                if (map[x, y-1] is Drone)
+                {
+                    var drone = (Drone) map[x, y-1];            
+                    droneNeighbours.Add((x, y-1, drone));
+                }
             }
 
-            return (unexploredNeighbours, exploredNeighbours);
+            return new Neighbours{
+                Unexplored = unexploredNeighbours,
+                Explored = exploredNeighbours,
+                Drone = droneNeighbours
+            };
         }
 
 
