@@ -7,12 +7,4 @@ The aim for this is to provide a cluster of stateless functions that together ca
 
 ## TODO
 
--Write maze generation in InitFrame
--Write basic drone explore logic
--Write NextStep function
--Add master/slave relationship between drones
-
-## Done
-
--Add drone to map in InitFrame
--Add more drones in InitFunction
+1. Add vision to drones to better show them exploring maze.
