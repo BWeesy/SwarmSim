@@ -38,9 +38,11 @@ namespace SwarmSim.Classes.Entities
         public static ISpace[,] UngroupedDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
-            //TODO Look for close Leaders with space in their group. If found, move towards them
-            //Else, explore by moving towards closest unexplored space
-            var targetSpace = PickMoveTarget(x, y, map);
+            //Explore by moving towards closest unexplored space, prefering the least recently explored space
+
+            var neighbours = GetNeighbours(x, y, map);   
+
+            var targetSpace = Explore(neighbours);
 
             if (targetSpace != null)
             {
@@ -91,11 +93,8 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-
-
-        private static (int x, int y)? PickMoveTarget(int x, int y, ISpace[,] map)
-        {
-            var neighbours = GetNeighbours(x, y, map);            
+        private static (int x, int y)? Explore((List<(int x, int y)> unexploredNeighbours, List<(int x, int y, int activity)> exploredNeighbours) neighbours)
+        {   
             var unexploredNeighbours = neighbours.unexploredNeighbours;
             var exploredNeighbours = neighbours.exploredNeighbours;
 
