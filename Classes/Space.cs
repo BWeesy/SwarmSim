@@ -36,6 +36,12 @@ namespace SwarmSim.Classes.Entities
                 JObject obj = JObject.Load(reader);
                 if(obj["State"] != null && Enum.TryParse<EntityType>(obj["State"].ToString(), out var value))
                 {
+                    int activity = 0;
+                    if (obj["Activity"] != null && Int32.TryParse(obj["Activity"].ToString(), out var parsedActivity))
+                    {
+                        activity = parsedActivity;
+                    }
+
                     switch (value)
                     {
                         case EntityType.Wall:
@@ -43,19 +49,13 @@ namespace SwarmSim.Classes.Entities
                         case EntityType.Unexplored:
                             return new Unexplored();
                         case EntityType.Explored:
-                            return new Explored(
-                                    obj["Activity"] != null && Int32.TryParse(obj["Activity"].ToString(), out var activity) ? activity : 0
-                                );
+                            return new Explored(activity);
                         case EntityType.UngroupedDrone:
                             return new Drone();
-                        case EntityType.LeaderDrone:
-                            return new Drone(){
-                                State = EntityType.LeaderDrone
-                            };
+                        case EntityType.PredatorDrone:
+                            return new Drone(EntityType.PredatorDrone, activity);
                         case EntityType.SubordinateDrone:
-                            return new Drone(){
-                                State = EntityType.SubordinateDrone
-                            };
+                            return new Drone(EntityType.SubordinateDrone);
                         default:
                         throw new NotImplementedException("Not implemented yet");
                     }

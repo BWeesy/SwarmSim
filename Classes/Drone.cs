@@ -9,8 +9,16 @@ namespace SwarmSim.Classes.Entities
     public class Drone : Space
     {
         public EntityType State = EntityType.UngroupedDrone;
+        public int Activity = 0;
 
         public override bool IsSolid() => false;
+
+
+        public Drone(EntityType state = EntityType.UngroupedDrone, int activity = 0)
+        {
+            State = state;
+            Activity = activity;
+        }
 
         public override string ToString()
         {
@@ -18,7 +26,7 @@ namespace SwarmSim.Classes.Entities
             {
                 case EntityType.UngroupedDrone:
                     return "8";
-                case EntityType.LeaderDrone:
+                case EntityType.PredatorDrone:
                     return "0";
                 case EntityType.SubordinateDrone:
                     return "O";
@@ -42,7 +50,7 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-        public static ISpace[,] LeaderDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
+        public static ISpace[,] PredatorDroneMove(int x, int y, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
             //Explore by moving towards closest unexplored space

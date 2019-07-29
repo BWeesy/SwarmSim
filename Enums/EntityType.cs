@@ -6,7 +6,7 @@ namespace SwarmSim.Enums
         Unexplored,
         Explored,
         UngroupedDrone,
-        LeaderDrone,
+        PredatorDrone,
         SubordinateDrone
     }
 }
