@@ -24,13 +24,13 @@ namespace SwarmSim
             }
         }
 
-        public void Init(int drones = 3)
+        public void Init(int drones = 3, int predators = 1)
         {
             do
             {
             _map = InitialiseMapToWalls(_map);
             _map = MapGenStep(_map, _rng.Next(map.GetLength(0)), _rng.Next(map.GetLength(1)));
-            _map = AddDrones(_map, drones);
+            _map = AddDrones(_map, drones, predators);
             } while (!IsValidMap(_map));
         }
 
@@ -84,7 +84,7 @@ namespace SwarmSim
             return neighbours;
         }
 
-        private ISpace[,] AddDrones(ISpace[,] map, int drones)
+        private ISpace[,] AddDrones(ISpace[,] map, int drones, int predators)
         {
             int xCoord;
             int yCoord;
@@ -95,9 +95,20 @@ namespace SwarmSim
                 {
                     xCoord = _rng.Next(0,map.GetLength(0));
                     yCoord = _rng.Next(0,map.GetLength(1));
-                } while (map[xCoord,yCoord].IsSolid());
+                } while (map[xCoord,yCoord] is Unexplored == false);
 
-                map[xCoord,yCoord] = new Drone();
+                map[xCoord,yCoord] = new Drone(EntityType.UngroupedDrone);
+            }
+
+            for (int i = 0; i < predators; i++)
+            {
+                do
+                {
+                    xCoord = _rng.Next(0,map.GetLength(0));
+                    yCoord = _rng.Next(0,map.GetLength(1));
+                } while (map[xCoord,yCoord] is Unexplored == false);
+
+                map[xCoord,yCoord] = new Drone(EntityType.PredatorDrone);
             }
 
             return map;
@@ -184,8 +195,8 @@ namespace SwarmSim
             //Find drones and decrement the activities of explored spaces
             var drones = FindDronesAndDecrementExplored(map);
 
-            var sortedDrones = drones.Where(x => x.drone.State == EntityType.UngroupedDrone)
-            .Concat(drones.Where(x => x.drone.State == EntityType.LeaderDrone))
+            var sortedDrones = drones.Where(x => x.drone.State == EntityType.PredatorDrone)
+            .Concat(drones.Where(x => x.drone.State == EntityType.UngroupedDrone))
             .Concat(drones.Where(x => x.drone.State == EntityType.SubordinateDrone));
 
             //Apply the movement of each drone in turn
@@ -197,8 +208,8 @@ namespace SwarmSim
                     case EntityType.UngroupedDrone:
                         map = Drone.UngroupedDroneMove(drone.x, drone.y, drone.drone, map);
                         break;
-                    case EntityType.LeaderDrone:
-                        map = Drone.LeaderDroneMove(drone.x, drone.y, drone.drone, map);
+                    case EntityType.PredatorDrone:
+                        map = Drone.PredatorDroneMove(drone.x, drone.y, drone.drone, map);
                         break;
                     case EntityType.SubordinateDrone:
                         map = Drone.SubordinateDroneMove(drone.x, drone.y, drone.drone, map);
