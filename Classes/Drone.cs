@@ -91,11 +91,23 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
+
+
         private static (int x, int y)? PickMoveTarget(int x, int y, ISpace[,] map)
         {
+            var neighbours = GetNeighbours(x, y, map);            
+            var unexploredNeighbours = neighbours.unexploredNeighbours;
+            var exploredNeighbours = neighbours.exploredNeighbours;
+
+            var rng = new Random();            
+            return unexploredNeighbours.Count > 0
+            ? unexploredNeighbours[rng.Next(unexploredNeighbours.Count)]
+            : exploredNeighbours.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
+        }
+
+        private static (List<(int x, int y)> unexploredNeighbours, List<(int x, int y, int activity)> exploredNeighbours) GetNeighbours(int x, int y, ISpace[,] map){
             var unexploredNeighbours = new List<(int x, int y)>();
             var exploredNeighbours = new List<(int x, int y, int activity)>();
-            var rng = new Random();
 
             //x+ve direction
             if(x < map.GetLength(0) - 1 && !map[x+1, y].IsSolid())
@@ -152,11 +164,11 @@ namespace SwarmSim.Classes.Entities
                     exploredNeighbours.Add((x, y-1, explored.Activity));
                 } 
             }
-            
-            return unexploredNeighbours.Count > 0
-            ? unexploredNeighbours[rng.Next(unexploredNeighbours.Count)]
-            : exploredNeighbours.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
+
+            return (unexploredNeighbours, exploredNeighbours);
         }
+
+
         //TODO Patchfinding method
         //TODO Explore method
             //Look for closest unexplored
