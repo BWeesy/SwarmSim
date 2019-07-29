@@ -52,25 +52,36 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-        public static ISpace[,] PredatorDroneMove(int currentX, int currentY, Drone drone, ISpace[,] previousMap)
+        public static ISpace[,] PredatorDroneMove(int originalX, int originalY, Drone drone, ISpace[,] previousMap)
         {
             var map = previousMap;
+            var currentX = originalX;
+            var currentY = originalY;
 
-            var neighbours = GetNeighbours(currentX, currentY, map);   
-            (int x, int y)? targetSpace = null;
-
-            //targetSpace = Kill(neighbours, map);
-
-            if(targetSpace == null){
-                targetSpace = Hunt(neighbours, map);
-            }
-            if(targetSpace == null){
-                targetSpace = Explore(neighbours);
-            }
-
-            if (targetSpace != null)
+            for (int i = 0; i < 2; i++)
             {
-                map = MoveDrone(currentX, currentY, targetSpace.Value.x, targetSpace.Value.y, map);
+                var neighbours = GetNeighbours(currentX, currentY, map);   
+                (int x, int y)? targetSpace = null;
+
+                targetSpace = Kill(neighbours);
+                if(targetSpace != null){
+                    AttackDrone(currentX, currentY, targetSpace.Value.x, targetSpace.Value.y, map);
+                    break;
+                }
+
+                if(targetSpace == null){
+                    targetSpace = Hunt(neighbours);
+                }
+                if(targetSpace == null){
+                    targetSpace = Explore(neighbours);
+                }
+
+                if (targetSpace != null)
+                {
+                    map = MoveDrone(currentX, currentY, targetSpace.Value.x, targetSpace.Value.y, map);
+                    currentX = targetSpace.Value.x;
+                    currentY = targetSpace.Value.y;
+                }
             }
 
             return map;
@@ -83,13 +94,51 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
+        private static (int x, int y)? Explore(Neighbours neighbours)
+        {   
+            var rng = new Random();
+
+            if(neighbours.Unexplored.Count + neighbours.Explored.Count == 0){
+                return null;
+            }
+
+            var selectedExplored = neighbours.Explored.All(e => e.activity == 0) && neighbours.Explored.Any()
+            ? neighbours.Explored.Select(e => (e.x, e.y)).ToArray()[rng.Next(neighbours.Explored.Count)]
+            : neighbours.Explored.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
+            
+            return neighbours.Unexplored.Count > 0
+            ? neighbours.Unexplored[rng.Next(neighbours.Unexplored.Count)]
+            : selectedExplored;
+        }
+        
+        private static (int x, int y)? Hunt(Neighbours neighbours)
+        {   
+            var rng = new Random();
+
+            var activeNeighbours = neighbours.Explored.Where(e => e.activity > 0).OrderByDescending(e => e.activity);
+            if(activeNeighbours.Count() > 0) return activeNeighbours.Select(e => (e.x, e.y)).FirstOrDefault();
+            return null;
+        }
+
+        private static (int x, int y)? Kill(Neighbours neighbours)
+        {   
+            var rng = new Random();
+
+            var adjacentprey = neighbours.Drone.Where(d => d.drone.State == EntityType.UngroupedDrone);
+            
+            if( adjacentprey.Count() > 0){
+                return adjacentprey.Select(e => (e.x, e.y)).FirstOrDefault();
+            }
+            return null;
+        }
+
         private static ISpace[,] MoveDrone(int currentX, int currentY, int targetX, int targetY, ISpace[,] previousMap)
         {
             var map = previousMap;
             //Validate currentCoords are actually a drone
             if (!(map[currentX, currentY] is Drone))
             {
-               throw new Exception($"Failed to move drone from {map[currentX, currentY]} as it is not a drone");
+               return map;
             }
             //Validate target is not solid
             if (map[targetX, targetY].IsSolid())
@@ -112,25 +161,28 @@ namespace SwarmSim.Classes.Entities
             return map;
         }
 
-        private static (int x, int y)? Explore(Neighbours neighbours)
-        {   
-            if(neighbours.Unexplored.Count + neighbours.Explored.Count == 0){
-                return null;
+        private static ISpace[,] AttackDrone(int currentX, int currentY, int targetX, int targetY, ISpace[,] previousMap)
+        {
+            var map = previousMap;
+            //Validate currentCoords are actually a drone
+            if (!(map[currentX, currentY] is Drone))
+            {
+               throw new Exception($"Failed to attack with drone at {map[currentX, currentY]} as it is not a drone");
+            }
+            //Validate target is a drone
+            if (map[targetX, targetY] is Drone == false)
+            {
+               throw new Exception($"Failed to attack drone at {map[targetX, targetY]} as that space is not a drone");
             }
 
-            var rng = new Random();            
-            return neighbours.Unexplored.Count > 0
-            ? neighbours.Unexplored[rng.Next(neighbours.Unexplored.Count)]
-            : neighbours.Explored.OrderBy(e => e.activity).Select(e => (e.x, e.y)).FirstOrDefault();
-        }
-        
-        private static (int x, int y)? Hunt(Neighbours neighbours, ISpace[,] map)
-        {   
-            var rng = new Random();
+            //Move drone into the target space, swapping with a drone if moving into it's space
+            var targetDrone = map[targetX, targetY] as Drone;
 
-            var activeNeighbours = neighbours.Explored.Where(e => e.activity > 0).OrderByDescending(e => e.activity);
-            if(activeNeighbours.Count() > 0) return activeNeighbours.Select(e => (e.x, e.y)).FirstOrDefault();
-            return null;
+            if(targetDrone != null){
+                map[targetX, targetY] = new Explored(100);
+            }
+
+            return map;
         }
 
         private static Neighbours GetNeighbours(int x, int y, ISpace[,] map){
